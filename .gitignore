@@ -1,0 +1,28 @@
+# Environment
+.env
+nohup.out
+
+# Python
+__pycache__/
+*.pyc
+
+# Local Exports & Large Data
+*.json
+*.txt
+*.json_small
+full_server_export/
+dm_export/
+exporter/
+notes/
+
+# Exceptions (Keep these)
+!levels.json
+!ticket_counter.json
+!requirements.txt
+!README.md
+!Procfile
+!run_bot.py
+
+# Ignore helper scripts
+*.py
+!run_bot.py

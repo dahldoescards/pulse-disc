@@ -1,0 +1,7 @@
+discord.py
+python-dotenv
+asyncio
+json
+time
+random
+traceback

@@ -10,8 +10,20 @@ import traceback
 import re
 
 load_dotenv()
+# Load and validate environment variables
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-GUILD_ID = int(os.getenv('GUILD_ID'))
+raw_guild_id = os.getenv('GUILD_ID')
+
+if not TOKEN or not raw_guild_id:
+    print("CRITICAL ERROR: Missing DISCORD_BOT_TOKEN or GUILD_ID in environment variables.")
+    print("Please ensure these are added to your Railway Variables tab.")
+    exit(1)
+
+try:
+    GUILD_ID = int(raw_guild_id)
+except ValueError:
+    print(f"CRITICAL ERROR: GUILD_ID must be a number, got '{raw_guild_id}'")
+    exit(1)
 BETA_TESTER_ROLE_ID = 1473848523660460113
 ADMIN_ROLE_ID = 1473848200489336968
 

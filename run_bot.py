@@ -59,19 +59,32 @@ async def update_stats():
     cat = discord.utils.get(guild.categories, name="📊 SERVER PULSE")
     if not cat: cat = await guild.create_category("📊 SERVER PULSE", position=0)
     
-    # Member Count
-    m_count = guild.member_count
-    chan_m = discord.utils.get(cat.voice_channels, name=lambda x: "Total Members" in x)
-    if not chan_m: await guild.create_voice_channel(f"Total Members: {m_count}", category=cat, overwrites={guild.default_role: discord.PermissionOverwrite(connect=False)})
-    else: await chan_m.edit(name=f"Total Members: {m_count}")
+    # Helper to find and clean up channels
+    async def sync_stat_channel(prefix, count):
+        # Find all channels starting with the prefix
+        channels = [c for c in cat.voice_channels if c.name.startswith(prefix)]
+        
+        if not channels:
+            # Create new if none exist
+            await guild.create_voice_channel(f"{prefix}: {count}", category=cat, overwrites={guild.default_role: discord.PermissionOverwrite(connect=False)})
+        else:
+            # Update the first one
+            primary = channels[0]
+            if primary.name != f"{prefix}: {count}":
+                await primary.edit(name=f"{prefix}: {count}")
+            
+            # Delete any duplicates
+            for duplicate in channels[1:]:
+                try: await duplicate.delete()
+                except: pass
 
-    # Diamond Count
+    # Update Member Count
+    await sync_stat_channel("Total Members", guild.member_count)
+
+    # Update Diamond Count
     d_role = discord.utils.get(guild.roles, name="The Diamond")
-    if d_role:
-        d_count = len(d_role.members)
-        chan_d = discord.utils.get(cat.voice_channels, name=lambda x: "Diamond Members" in x)
-        if not chan_d: await guild.create_voice_channel(f"Diamond Members: {d_count}", category=cat, overwrites={guild.default_role: discord.PermissionOverwrite(connect=False)})
-        else: await chan_d.edit(name=f"Diamond Members: {d_count}")
+    d_count = len(d_role.members) if d_role else 0
+    await sync_stat_channel("Diamond Members", d_count)
 
 @bot.event
 async def on_ready():
